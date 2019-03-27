@@ -1,0 +1,5 @@
+{
+  "region": "eu-central-1",
+  "bucket": "test-cdn.banabi.com",
+  "storage_resized_images_target": "images/resized-products/"
+}
