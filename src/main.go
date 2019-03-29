@@ -55,11 +55,11 @@ func main() {
 	if configutil.IsEnvironmentAws() {
 		lambda.Start(HandleRequest)
 	} else {
-		batchGenerateImage()
+		testGenerateImage()
 	}
 }
 
-func batchGenerateImage() {
+func testGenerateImage() {
 	imageKeys := []string{
 		"images/product/download.jpeg",
 	}
