@@ -1,13 +1,12 @@
 package imageresizer
 
 import (
-	"github.com/nfnt/resize"
-	"image/jpeg"
-	"imagenation/src/configutil"
 	"log"
-	"os"
 	"path/filepath"
+	"store-image-resizer/src/configutil"
 	"strings"
+
+	"github.com/disintegration/imaging"
 )
 
 func CreateResizedImages(imagePath string) []string {
@@ -23,30 +22,24 @@ func CreateResizedImages(imagePath string) []string {
 }
 
 func resizeImage(size string, width, height uint, imageName string, originalImagePath string) string {
+	// Open a test image.
+	src, err := imaging.Open(originalImagePath)
+	if err != nil {
+		log.Fatalf("failed to open image: %v", err)
+	}
+
+	// Resize the cropped image to width = 200px preserving the aspect ratio.
+	src = imaging.Resize(src, int(width), 0, imaging.Lanczos)
+
+	// Create a blurred version of the image.
 	var createdImageName = getImageName(imageName, size)
-
-	file, err := os.Open(originalImagePath)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	img, err := jpeg.Decode(file)
-	if err != nil {
-		log.Fatal(err)
-	}
-	file.Close()
-
-	m := resize.Resize(width, height, img, resize.Lanczos3)
-
 	createdImagePath := configutil.GetTempFolderPath() + createdImageName
-	out, err := os.Create(createdImagePath)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer out.Close()
 
-	// write new tmp to file
-	jpeg.Encode(out, m, nil)
+	// Save the resulting image as JPEG.
+	err = imaging.Save(src, createdImagePath)
+	if err != nil {
+		log.Fatalf("failed to save image: %v", err)
+	}
 
 	return createdImagePath
 }
